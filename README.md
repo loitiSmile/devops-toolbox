@@ -7,21 +7,38 @@ Essential, tested, and secure DevOps CLI utilities for Linux system administrati
 
 ---
 
+## ⚡ Quickstart with `uv`
+
+This project is built and optimized for [`uv`](https://docs.astral.sh/uv/), the blazing-fast Python package manager:
+
+```bash
+# Run the SSL Checker directly with uv without manual environment setup
+uv run ssl-checker github.com
+
+# Run in JSON mode
+uv run ssl-checker internal.corp.net -p 8443 --json
+
+# Run all test suites
+uv run python -m unittest discover -s tests/ -p "test_*.py"
+
+# Run linters
+uv run --extra dev ruff check bin/ tests/
+```
+
+---
+
 ## 🛠️ Included Tools
 
-### 1. SSL Certificate Checker (`bin/ssl_checker.py`)
+### 1. SSL Certificate Checker (`ssl-checker` / `bin/ssl_checker.py`)
 
 Inspects remote TLS/SSL certificates, calculating exact days until expiration, issuer organization, and Subject Alternative Names (SAN). Supports structured JSON output for automated alerting.
 
 ```bash
-# Basic inspection
-./bin/ssl_checker.py github.com
+# Using entry point via uv
+uv run ssl-checker github.com
 
-# Custom port with JSON output
-./bin/ssl_checker.py internal.corp.net -p 8443 --json
-
-# Set custom expiration warning threshold (days)
-./bin/ssl_checker.py example.org -w 30
+# Using direct script path
+./bin/ssl_checker.py github.com -p 443 --warning-days 30
 ```
 
 ---
@@ -51,11 +68,9 @@ Generates a formatted, ShellCheck-compliant diagnostic overview of the host:
 
 ## 🧪 Testing & Code Quality
 
-Run the local test suites:
-
 ```bash
-# Run Python Unit Tests
-python3 -m unittest discover -s tests/ -p "test_*.py"
+# Run Python Unit Tests with uv
+uv run python -m unittest discover -s tests/ -p "test_*.py"
 
 # Run Shell Script Tests
 bash tests/test_system_report.sh
@@ -66,6 +81,7 @@ bash tests/test_system_report.sh
 ## 🔒 Security & CI Pipeline
 
 This project adheres to strict automated quality and security checks via GitHub Actions:
+- **Fast CI with uv:** Managed via `astral-sh/setup-uv@v5`.
 - **Linting:** ShellCheck for shell scripts, Ruff & Flake8 for Python.
 - **Unit Testing Matrix:** Tested against Python 3.10, 3.11, and 3.12.
 - **SAST (Static Application Security Testing):** GitHub CodeQL security analysis.
