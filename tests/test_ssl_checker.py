@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from bin.ssl_checker import parse_args, get_certificate_info
+
+from bin.ssl_checker import get_certificate_info, parse_args
 
 
 class TestSSLChecker(unittest.TestCase):

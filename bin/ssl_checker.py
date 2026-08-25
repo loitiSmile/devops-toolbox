@@ -6,16 +6,18 @@ Retrieves and inspects remote SSL/TLS certificates, reporting days remaining
 until expiration, issuer details, subject alternative names (SAN), and validity status.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import socket
 import ssl
 import sys
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
-def get_certificate_info(hostname: str, port: int = 443, timeout: float = 5.0) -> Dict[str, Any]:
+def get_certificate_info(hostname: str, port: int = 443, timeout: float = 5.0) -> dict[str, Any]:
     """
     Connects to a remote host and fetches its TLS certificate.
 
@@ -49,7 +51,7 @@ def get_certificate_info(hostname: str, port: int = 443, timeout: float = 5.0) -
     is_expired = now > not_after
 
     # Extract Subject Alternative Names
-    sans: List[str] = []
+    sans: list[str] = []
     alt_names = cert.get("subjectAltName") or ()
     for field in alt_names:
         if isinstance(field, tuple) and len(field) >= 2 and field[0] == "DNS":
@@ -57,7 +59,7 @@ def get_certificate_info(hostname: str, port: int = 443, timeout: float = 5.0) -
 
     # Extract Issuer Common Name or Organization
     issuer_tuples = cert.get("issuer") or ()
-    issuer_dict: Dict[str, str] = {}
+    issuer_dict: dict[str, str] = {}
     for item in issuer_tuples:
         if isinstance(item, tuple):
             for sub in item:
@@ -78,7 +80,7 @@ def get_certificate_info(hostname: str, port: int = 443, timeout: float = 5.0) -
     }
 
 
-def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
+def parse_args(args: list[str] | None = None) -> argparse.Namespace:
     """Parses command-line arguments."""
     parser = argparse.ArgumentParser(
         description="Inspect SSL/TLS certificate expiration date, issuer, and health status."
@@ -95,7 +97,7 @@ def main() -> int:
     args = parse_args()
     try:
         data = get_certificate_info(args.host, port=args.port, timeout=args.timeout)
-    except Exception as exc:
+    except (socket.error, ssl.SSLError, ValueError) as exc:
         if args.json:
             print(json.dumps({"error": str(exc), "hostname": args.host}))
         else:
